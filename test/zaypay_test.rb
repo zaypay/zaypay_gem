@@ -15,6 +15,16 @@ class ZaypayTest < Test::Unit::TestCase
       @ip = '95.97.131.28'
     end
     
+    
+    context "#initialize" do
+      context "with no-args" do
+        should "lookup for a yml within Rails root" do
+          mock.proxy(YAML).load_file
+          Zaypay::PriceSetting.new
+        end
+      end
+    end
+    
     context "#locale_for_ip" do
 
       should "call class method get" do
@@ -31,13 +41,13 @@ class ZaypayTest < Test::Unit::TestCase
     
     context "#list_locales" do
       context "with optional amount" do
-        should "call class method GET with the right url" do
+        should "call class method GET with the correct url" do
           mock.proxy(Zaypay::PriceSetting).get("#{@base_uri}/10/pay/#{@price_setting_id}/list_locales", {:query => {:key => @api_key}, :headers => @headers } )
           @ps.list_locales(10)
         end
       end
       
-      should "call class method GET with the right url" do
+      should "call class method GET with the correct url" do
         amount = nil
         mock.proxy(Zaypay::PriceSetting).get("#{@base_uri}/#{amount}/pay/#{@price_setting_id}/list_locales", {:query => {:key => @api_key}, :headers => @headers } )
         @ps.list_locales
@@ -53,7 +63,7 @@ class ZaypayTest < Test::Unit::TestCase
     context "#list_countries" do      
       
       context "with optional amount" do
-        should "call class method GET with the right url" do
+        should "call class method GET with the correct url" do
           mock.proxy(Zaypay::PriceSetting).get("#{@base_uri}/10/pay/#{@price_setting_id}/list_locales", {:query => {:key => @api_key}, :headers => @headers } )
           @ps.list_countries(10)
         end
@@ -74,7 +84,7 @@ class ZaypayTest < Test::Unit::TestCase
     context "#list_languages" do
       
       context "with optional amount" do
-        should "call class method GET with the right url" do
+        should "call class method GET with the correct url" do
           mock.proxy(Zaypay::PriceSetting).get("#{@base_uri}/10/pay/#{@price_setting_id}/list_locales", {:query => {:key => @api_key}, :headers => @headers } )
           @ps.list_languages(10)
         end
@@ -95,7 +105,7 @@ class ZaypayTest < Test::Unit::TestCase
     context "#list_payment_methods" do
       
       context "with optional amount" do
-        should "call class method GET with the right url" do
+        should "call class method GET with the correct url" do
           mock.proxy(Zaypay::PriceSetting).get("#{@base_uri}/10/nl-NL/pay/#{@price_setting_id}/payments/new", {:query => {:key => @api_key}, :headers => @headers } )
           payment_methods = @ps.list_payment_methods('nl-NL', 10)
         end
@@ -110,12 +120,28 @@ class ZaypayTest < Test::Unit::TestCase
         payment_methods = @ps.list_payment_methods('nl-NL')
         assert payment_methods.has_key?(:payment_methods)
       end
+      
+      context "call with a locale-hash as arg" do
+        setup do
+          @locale = @ps.locale_for_ip('82.94.123.123')
+        end
+        
+        should "call #stringify_locale_hash" do
+          mock.proxy(@ps).stringify_locale_hash({:country=>"NL", :language=>"nl"})
+          @ps.list_payment_methods(@locale)
+        end
+        
+        should "call class method GET with the correct URL" do
+          mock.proxy(Zaypay::PriceSetting).get("#{@base_uri}/10/nl-NL/pay/#{@price_setting_id}/payments/new", {:query => {:key => @api_key}, :headers => @headers } )
+          @ps.list_payment_methods(@locale, 10)
+        end
+      end
     end
     
     context "#create_payment" do
       
       context  "with optional amount" do
-        should "call class method POST with the right url" do
+        should "call class method POST with the correct url" do
           mock.proxy(Zaypay::PriceSetting).post("#{@base_uri}/10/nl-NL/pay/#{@price_setting_id}/payments", {:query => {:key => @api_key, :payment_method_id => 2}, :headers => @headers })
           @ps.create_payment('nl-NL', 2, 10)          
         end
@@ -135,7 +161,7 @@ class ZaypayTest < Test::Unit::TestCase
     
     context "#create_payment_with_custom_variables" do
       context "with optional amount" do
-        should "call class method POST with the right url" do
+        should "call class method POST with the correct url" do
           mock.proxy(Zaypay::PriceSetting).post("#{@base_uri}/10/nl-NL/pay/#{@price_setting_id}/payments", {:query => {:key => @api_key, :product_id => 23, :order_id => 45, :payment_method_id =>2}, :headers => @headers })
           @ps.create_payment_with_custom_variables('nl-NL', {:product_id => 23, :order_id => 45, :payment_method_id =>2 }, 10)
         end
@@ -157,7 +183,7 @@ class ZaypayTest < Test::Unit::TestCase
     
     context "#create_payment_with_payalogue_id" do
       context "with optional amount" do
-        should "call class method POST with the right url" do
+        should "call class method POST with the correct url" do
           mock.proxy(Zaypay::PriceSetting).post("#{@base_uri}/10/nl-NL/pay/#{@price_setting_id}/payments", {:query => {:key => @api_key, :payment_method_id => 2, :payalogue_id => 120474}, :headers => @headers })
           @ps.create_payment_with_payalogue_id(120474, 'nl-NL', 2, 10)
         end
