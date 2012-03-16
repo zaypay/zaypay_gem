@@ -20,19 +20,22 @@ module Zaypay
       end
     end
 
+    # returns a hash containing keys countries and languages
     def list_locales(amount=nil)
       get "/#{amount}/pay/#{price_setting_id}/list_locales" do |data|
         {:countries => data[:countries][:country],
          :languages => data[:languages][:language]}
       end
     end
-  
+
+    # returns an array with countries
     def list_countries(amount=nil)
       get "/#{amount}/pay/#{price_setting_id}/list_locales" do |data|
         data[:countries][:country]
       end
     end
-    
+
+    # returns an array with languages
     def list_languages(amount=nil)
       get "/#{amount}/pay/#{price_setting_id}/list_locales" do |data|
         data[:languages][:language]

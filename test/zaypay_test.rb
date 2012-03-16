@@ -3,7 +3,7 @@ require 'zaypay'
 
 class ZaypayTest < Test::Unit::TestCase
   include RR::Adapters::TestUnit
-  
+
   context "Zaypay::PriceSetting" do
 
     setup do
@@ -18,9 +18,16 @@ class ZaypayTest < Test::Unit::TestCase
     
     context "#initialize" do
       context "with no-args" do
-        should "lookup for a yml within Rails root" do
-          mock.proxy(YAML).load_file
+        should "lookup for a yml within Rails config" do
+          mock(YAML).load_file('anywhere/config/zaypay.yml').returns({131404=>"43b02bf0bf6c956d74a18e1e598338b0", "default"=>131404})
           Zaypay::PriceSetting.new
+        end
+        
+        should "raise Error if the yml file is not present" do
+          assert_raise Errno::ENOENT do
+            mock.proxy(YAML).load_file("anywhere/config/zaypay.yml")
+            Zaypay::PriceSetting.new
+          end
         end
       end
     end
