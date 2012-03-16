@@ -1,0 +1,6 @@
+require 'test/unit'
+require 'shoulda'
+require 'rr'
+require 'turn'
+require 'active_support'
+require 'active_support/core_ext/hash'
