@@ -60,7 +60,12 @@ module Zaypay
     # Otherwise the API may not select the user's desired payment_method 
     # However the payment_method is not returned to the report url
     def create_payment_with_custom_variables(locale, custom_variables={}, amount=nil)
-      custom_variables.symbolize_keys!
+      if custom_variables.respond_to?(:symbolize_keys!)
+        custom_variables.symbolize_keys!
+      else
+        define_turn_keys_to_symbol!(custom_variables)
+        custom_variables.turn_keys_to_symbol!
+      end
       raise "the :payment_method_id key must be included in the custom_variables hash" if !custom_variables.has_key?(:payment_method_id)
       post "/#{amount}/#{locale}/pay/#{price_setting_id}/payments", custom_variables do |data|
         payment_hash data
@@ -123,8 +128,22 @@ module Zaypay
     end
     
     def recursive_symbolize_keys!(hash)
-      hash.symbolize_keys!
+      if hash.respond_to?(:symbolize_keys!)
+        hash.symbolize_keys!
+      else
+        define_turn_keys_to_symbol!(hash)
+        hash.turn_keys_to_symbol!
+      end
       hash.values.select{|v| v.is_a? Hash}.each{|h| recursive_symbolize_keys!(h)}
+    end
+    
+    def define_turn_keys_to_symbol!(hash)
+      def hash.turn_keys_to_symbol!
+        keys.each do |key|
+          self[(key.to_sym rescue key) || key] = delete(key)
+        end
+        self
+      end
     end
     
     def payment_hash(data)

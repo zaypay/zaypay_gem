@@ -17,12 +17,13 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   
   # 3.0.12 , 3.1.3
-  s.add_dependency('rails', '~> 3.1')
+  # s.add_dependency('rails', '~> 3.1')
   s.add_dependency('httparty', '~> 0.8.1')
 
   s.add_development_dependency('shoulda')
   s.add_development_dependency('minitest')
   s.add_development_dependency('rr')
+  s.add_development_dependency('simplecov')
   s.add_development_dependency('turn')
   s.add_development_dependency('test-unit', '~> 2.0.0')
 end

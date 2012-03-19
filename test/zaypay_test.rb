@@ -33,12 +33,12 @@ class ZaypayTest < Test::Unit::TestCase
     end
     
     context "#locale_for_ip" do
-
+    
       should "call class method get" do
         mock.proxy(Zaypay::PriceSetting).get("#{@base_uri}/#{@ip}/pay/#{@ps.price_setting_id}/locale_for_ip", {:query => {:key => @api_key}, :headers => @headers })
         @ps.locale_for_ip('95.97.131.28')
       end
-
+    
       should "return a country-language hash" do
         locale = @ps.locale_for_ip('95.97.131.28')
         assert locale.has_key?(:country)
@@ -59,7 +59,7 @@ class ZaypayTest < Test::Unit::TestCase
         mock.proxy(Zaypay::PriceSetting).get("#{@base_uri}/#{amount}/pay/#{@price_setting_id}/list_locales", {:query => {:key => @api_key}, :headers => @headers } )
         @ps.list_locales
       end
-
+    
       should "contain a langauages hash and a countries hash" do
         locales = @ps.list_locales
         assert locales.has_key?(:countries)
@@ -180,7 +180,7 @@ class ZaypayTest < Test::Unit::TestCase
         assert payment[:payment][:your_variables]
         assert_equal 2, payment[:payment][:payment_method_id]
       end
-
+    
       should "raise an exception if :payment_method_id is not given" do
         assert_raise RuntimeError do
           @ps.create_payment_with_custom_variables('nl-NL', {:product_id => 23, :order_id => 45 }, 10)
@@ -202,19 +202,19 @@ class ZaypayTest < Test::Unit::TestCase
         assert payment[:payment][:payalogue_url]
       end
     end
-    
+
     context "#show_payment" do
       should "call class method GET and returns a hash with a key named :payment" do
-        mock.proxy(Zaypay::PriceSetting).get("#{@base_uri}///pay/#{@price_setting_id}/payments/373623764", {:query => {:key => @api_key}, :headers => @headers } )
-        payment = @ps.show_payment(373623764)
+        mock.proxy(Zaypay::PriceSetting).get("#{@base_uri}///pay/#{@price_setting_id}/payments/374277464", {:query => {:key => @api_key}, :headers => @headers } )
+        payment = @ps.show_payment(374277464)
         assert payment.has_key?(:payment)
       end
     end
-    
+
     context "#verification_code" do
       should "call class method POST and returns a hash with a key named :payment" do
-        mock.proxy(Zaypay::PriceSetting).post("#{@base_uri}///pay/#{@price_setting_id}/payments/373623764/verification_code", {:query => {:key => @api_key, :verification_code => 1234}, :headers => @headers })
-        payment = @ps.verification_code(373623764, 1234)
+        mock.proxy(Zaypay::PriceSetting).post("#{@base_uri}///pay/#{@price_setting_id}/payments/374277464/verification_code", {:query => {:key => @api_key, :verification_code => 1234}, :headers => @headers })
+        payment = @ps.verification_code(374277464, 1234)
         assert payment.has_key?(:payment)
       end
     end

@@ -6,8 +6,8 @@ require 'shoulda'
 require 'rr'
 require 'turn'
 
-require 'active_support'
-require 'active_support/core_ext/hash'
+# require 'active_support'
+# require 'active_support/core_ext/hash'
 
 module Zaypay
   class PriceSetting
