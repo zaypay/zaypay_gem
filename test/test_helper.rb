@@ -3,11 +3,11 @@ SimpleCov.start
 
 require 'test/unit'
 require 'shoulda'
-require 'rr'
+require 'mocha'
 require 'turn'
+require 'debugger'
+require 'fakeweb'
 
-# require 'active_support'
-# require 'active_support/core_ext/hash'
 
 module Zaypay
   class PriceSetting

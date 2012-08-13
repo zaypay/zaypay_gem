@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response status="error">
+  <error>It is not supported to use dynamic amounts with a Price Setting that is in Full Control mode. Use one in (Super) Easy mode if you want to use dynamic amounts through the API.</error>
+</response>

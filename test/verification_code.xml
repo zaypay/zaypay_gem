@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response status="success">
+  <payment>
+    <created-at type="datetime">2012-07-11T13:53:35Z</created-at>
+    <id type="integer">789456321</id>
+    <locale>nl-NL</locale>
+    <paycode>1543</paycode>
+    <payload-provided type="boolean">true</payload-provided>
+    <total-amount type="decimal">0.25</total-amount>
+    <currency>EUR</currency>
+    <amount-euro type="float">0.25</amount-euro>
+    <total-payout type="decimal">0.05</total-payout>
+    <number>7711</number>
+    <formatted-number>7711</formatted-number>
+    <keyword>PAY</keyword>
+    <platform>sms</platform>
+    <human-platform>sms</human-platform>
+    <messages-to-be-sent type="integer">1</messages-to-be-sent>
+    <messages-left-to-be-sent type="integer">0</messages-left-to-be-sent>
+    <partly-customer-phone-number>3161158xxxx</partly-customer-phone-number>
+    <customer-phone-number-hash>f86610eb216961e7caa46f009cb990bd98b0c8ae</customer-phone-number-hash>
+    <customer-mo-message>PAY 1543</customer-mo-message>
+    <verification-needed type="boolean">false</verification-needed>
+    <status>paid</status>
+    <payment-method-id type="integer">2</payment-method-id>
+    <ip-address>95.97.131.28</ip-address>
+  </payment>
+</response>

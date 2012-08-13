@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response status="success">
+  <locale-info>
+    <current-locale>nl-NL</current-locale>
+  </locale-info>
+  <payment-methods>
+    <payment-method>
+      <charged-amount type="decimal">1.000000000</charged-amount>
+      <eur-charged-amount type="decimal">1.0</eur-charged-amount>
+      <payout type="decimal">0.700000000000000000</payout>
+      <name>phone</name>
+      <payment-method-id type="integer">1</payment-method-id>
+      <very-short-instructions>betaal per telefoon</very-short-instructions>
+      <formatted-amount>&#8364; 1,00</formatted-amount>
+      <very-short-instructions-with-amount>betaal &#8364; 1,00 per telefoon</very-short-instructions-with-amount>
+    </payment-method>
+    <payment-method>
+      <charged-amount type="decimal">1.100000000</charged-amount>
+      <eur-charged-amount type="decimal">1.1</eur-charged-amount>
+      <payout type="decimal">0.540000000000000000</payout>
+      <name>sms</name>
+      <payment-method-id type="integer">2</payment-method-id>
+      <very-short-instructions>betaal per sms</very-short-instructions>
+      <formatted-amount>&#8364; 1,10</formatted-amount>
+      <very-short-instructions-with-amount>betaal &#8364; 1,10 per sms</very-short-instructions-with-amount>
+    </payment-method>
+  </payment-methods>
+</response>

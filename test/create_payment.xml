@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response status="success">
+  <payment>
+    <created-at type="datetime">2012-07-31T09:48:18Z</created-at>
+    <id type="integer">789456321</id>
+    <locale>nl-NL</locale>
+    <paycode>1372</paycode>
+    <payload-provided type="boolean">false</payload-provided>
+    <total-amount type="decimal">0.9</total-amount>
+    <currency>EUR</currency>
+    <amount-euro type="float">0.9</amount-euro>
+    <total-payout type="decimal">0.42</total-payout>
+    <number>7711</number>
+    <formatted-number>7711</formatted-number>
+    <keyword>PAY</keyword>
+    <platform>sms</platform>
+    <human-platform>sms</human-platform>
+    <messages-to-be-sent type="integer">1</messages-to-be-sent>
+    <messages-left-to-be-sent type="integer">1</messages-left-to-be-sent>
+    <partly-customer-phone-number>unknown</partly-customer-phone-number>
+    <customer-phone-number-hash>unknown</customer-phone-number-hash>
+    <customer-mo-message>unknown</customer-mo-message>
+    <verification-needed type="boolean">false</verification-needed>
+    <status>prepared</status>
+    <payment-method-id type="integer">2</payment-method-id>
+  </payment>
+  <status-string>De betaling is voorbereid</status-string>
+  <very-short-instructions>betaal per sms</very-short-instructions>
+  <very-short-instructions-with-amount>betaal &#8364; 0,90 per sms</very-short-instructions-with-amount>
+  <short-instructions>SMS de tekst PAY 1372 naar nummer 7711.</short-instructions>
+  <long-instructions>SMS de tekst PAY 1372 naar telefoonnummer 7711. Je zal 1 bericht ontvangen. Hiermee is dan &#8364; 0,90 betaald. Verder betaal je het normale tarief voor het versturen van &#233;&#233;n SMSje. </long-instructions>
+  <disclaimer>Je staat op het punt om met echt geld te betalen. Als je jonger bent dan 13 jaar, moet je hiervoor toestemming hebben van je ouders.</disclaimer>
+</response>

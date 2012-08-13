@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response status="success">
+  <locale-info>
+    <current-locale>nl-BE</current-locale>
+  </locale-info>
+  <payment-methods>
+    <payment-method>
+      <charged-amount type="decimal">1.00000</charged-amount>
+      <eur-charged-amount type="decimal">1.0</eur-charged-amount>
+      <payout type="decimal">0.41000000000000</payout>
+      <name>sms</name>
+      <payment-method-id type="integer">2</payment-method-id>
+      <very-short-instructions>betaal per sms</very-short-instructions>
+      <formatted-amount>&#8364; 1,00</formatted-amount>
+      <very-short-instructions-with-amount>betaal &#8364; 1,00 per sms</very-short-instructions-with-amount>
+    </payment-method>
+  </payment-methods>
+</response>
