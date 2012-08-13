@@ -12,7 +12,7 @@ class PriceSettingTest < Test::Unit::TestCase
       @api_key = '999a99999999aa9aaa99aa9a99a99a9a'
       @ps = Zaypay::PriceSetting.new(@price_setting_id, @api_key)
       @optional_amount = 10
-      
+
       @base_uri = 'https://secure.zaypay.com'
       @headers = {'Accept' => 'application/xml' }
       @ip = '12.34.456.89'
@@ -27,11 +27,14 @@ class PriceSettingTest < Test::Unit::TestCase
           assert_equal @api_key, ps.key
         end
         should "raise Error if yml is blank" do
-          assert_raise RuntimeError do
+          error = assert_raise Zaypay::Error do
             YAML.expects(:load_file).with('anywhere/config/zaypay.yml').returns({})
             Zaypay::PriceSetting.new
           end
+          assert_equal :config_error, error.type
+          assert_match "You did not provide a price_setting id or/and an API-key", error.message 
         end
+
         should "raise Error if the yml file is not present" do
           assert_raise Errno::ENOENT do
             Zaypay::PriceSetting.new
@@ -59,10 +62,12 @@ class PriceSettingTest < Test::Unit::TestCase
         end
         context "without a valid yml file" do  
           should "raise RuntimeError" do
-            assert_raise RuntimeError do
+            error = assert_raise Zaypay::Error do
               YAML.expects(:load_file).with('anywhere/config/zaypay.yml').returns({})
               ps = Zaypay::PriceSetting.new(@price_setting_id)
             end
+            assert_equal :config_error, error.type
+            assert_match "You did not provide a price_setting id or/and an API-key", error.message
           end
         end
       end
@@ -257,9 +262,11 @@ class PriceSettingTest < Test::Unit::TestCase
       
       context "the locale is not set" do
         should "throw an error" do
-          assert_raise RuntimeError, "hey did not raise the exception you expected" do
+          error = assert_raise Zaypay::Error do
             @ps.list_payment_methods
           end
+          assert_equal :locale_not_set, error.type
+          assert_equal "locale was not set for your price setting", error.message
         end
       end
 
@@ -290,17 +297,21 @@ class PriceSettingTest < Test::Unit::TestCase
       end
       
       should "raise an error when no locale has been set" do
-        assert_raise RuntimeError do
+        error = assert_raise Zaypay::Error do
           @ps.payment_method_id = 2 
           @ps.create_payment
         end
+        assert_equal :locale_not_set, error.type
+        assert_equal "locale was not set for your price setting", error.message
       end
 
       should "raise an error when no payment_method_id has been set" do
-        assert_raise RuntimeError do
+        error = assert_raise Zaypay::Error do
           @ps.locale = 'nl-NL'
           @ps.create_payment
         end
+        assert_equal :payment_method_id_not_set, error.type
+        assert_equal "payment_method_id was not set for your price setting", error.message
       end
 
       context "with an options hash" do
@@ -450,5 +461,38 @@ class PriceSettingTest < Test::Unit::TestCase
       end
     end
 
+    context "protected method #check" do
+      setup do
+       FakeWeb.register_uri(:get,"#{@base_uri}///pay/#{@price_setting_id}/payments/#{@payment_id}?key=#{@api_key}", 
+        [{:body => 'foobar', :status => ["404", "Not Found"]},
+        {:body => 'test/error_with_dynamic_amounts.xml', :content_type => "text/xml"}])
+        
+        @response_with_404 = HTTParty.get("#{@base_uri}///pay/#{@price_setting_id}/payments/#{@payment_id}", {:query => {:key => @api_key}, :headers => @headers })
+        @response_with_error_status= HTTParty.get("#{@base_uri}///pay/#{@price_setting_id}/payments/#{@payment_id}", {:query => {:key => @api_key}, :headers => @headers })
+      end
+      context "response code is not 200" do
+        should "raise Zaypay::Error of type :http_error" do
+          Zaypay::PriceSetting.expects(:get).with("#{@base_uri}///pay/#{@price_setting_id}/payments/#{@payment_id}", 
+                                            {:query => {:key => @api_key}, :headers => @headers } ).returns @response_with_404
+          error = assert_raise Zaypay::Error do
+            @ps.show_payment(@payment_id)
+          end
+          assert_equal :http_error, error.type
+          assert_equal "HTTP-request to zaypay yielded status 404..\n\nzaypay said:\nfoobar", error.message
+        end
+      end
+
+      context "reponse code is 200 but status of the xml-response is error" do
+        should "raise Zaypay::Error of type :http_error" do
+          Zaypay::PriceSetting.expects(:get).with("#{@base_uri}///pay/#{@price_setting_id}/payments/#{@payment_id}", 
+                                            {:query => {:key => @api_key}, :headers => @headers } ).returns @response_with_error_status
+          error = assert_raise Zaypay::Error do
+            @ps.show_payment(@payment_id)
+          end
+          assert_equal :http_error, error.type
+          assert_equal "HTTP-request to yielded an error:\n#{@response_with_error_status[:response][:error]}", error.message
+        end
+      end
+    end
   end
 end

@@ -57,7 +57,7 @@ module Zaypay
     end
 
     def list_payment_methods(options={})
-      raise "locale was not set" if @locale.nil?
+      raise Zaypay::Error.new(:locale_not_set, "locale was not set for your price setting") if @locale.nil?
       get "/#{options[:amount]}/#{@locale}/pay/#{price_setting_id}/payments/new" do |data|
         Zaypay::Util.arrayify_if_not_an_array(data[:payment_methods][:payment_method])
       end
@@ -65,8 +65,8 @@ module Zaypay
 
     # Example: @price_setting.create_payment(:custom_variable => "my value", :payalogue_id => payalogue_id, :amount => optional_amount )
     def create_payment(options={})
-      raise "locale was not set for your price setting" if @locale.nil?
-      raise "payment_method_id was not set for your price setting" if @payment_method_id.nil?
+      raise Zaypay::Error.new(:locale_not_set, "locale was not set for your price setting") if @locale.nil?
+      raise Zaypay::Error.new(:payment_method_id_not_set, "payment_method_id was not set for your price setting") if @payment_method_id.nil?
       query = {:payment_method_id => payment_method_id}
       query.merge!(options)
       amount = query.delete(:amount)
@@ -105,7 +105,8 @@ module Zaypay
         @price_setting_id = config['default'] unless @price_setting_id
         @key = config[@price_setting_id]
         if @key.nil? || @price_setting_id.nil?
-          raise "You did not provide a price_setting id or/and an API-key. You can either pass it to the constructor or create a config file (check out README)" 
+          raise Zaypay::Error.new(:config_error, "You did not provide a price_setting id or/and an API-key. You can either pass it to the constructor
+                                                  or create a config file (check out README)")
         end
       end
     end
@@ -121,8 +122,8 @@ module Zaypay
     end
 
     def check(response)
-      raise Zaypay::Error.new("HTTP-request to zaypay yielded status #{response.code}..\n\nzaypay said:\n#{response.body}") unless response.code == 200
-      raise Zaypay::Error.new("HTTP-request to yielded an error:\n#{response[:response][:error]}") if response[:response].delete(:status)=='error'
+      raise Zaypay::Error.new(:http_error, "HTTP-request to zaypay yielded status #{response.code}..\n\nzaypay said:\n#{response.body}") unless response.code == 200
+      raise Zaypay::Error.new(:http_error, "HTTP-request to yielded an error:\n#{response[:response][:error]}") if response[:response].delete(:status)=='error'
     end
 
     def default_query
