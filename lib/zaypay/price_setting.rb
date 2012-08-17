@@ -28,7 +28,7 @@ module Zaypay
     end
 
     def ip_country_is_configured?(ip, options={})
-      # country_code = locale_for_ip(ip)[:country]
+      # options can take a :amount key
       locale  = locale_for_ip(ip)
       country = list_countries(options).select{ |c| c.has_value? locale[:country] }.first
       {:country => country, :locale => locale} if country
