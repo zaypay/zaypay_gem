@@ -17,12 +17,12 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency('httparty', '~> 0.8.1')
-  s.add_development_dependency('debugger')
-  s.add_development_dependency('mocha')
-  s.add_development_dependency('shoulda')
-  s.add_development_dependency('fakeweb')
-  s.add_development_dependency('minitest')
-  s.add_development_dependency('simplecov')
-  s.add_development_dependency('turn')
+  s.add_development_dependency('debugger', "1.2.0")
+  s.add_development_dependency('mocha', '0.12.3')
+  s.add_development_dependency('shoulda', '3.0.1')
+  s.add_development_dependency('fakeweb', '1.3.0')
+  s.add_development_dependency('minitest', '2.11.3')
+  s.add_development_dependency('simplecov', '0.6.1')
+  s.add_development_dependency('turn', '0.9.3')
   s.add_development_dependency('test-unit', '~> 2.0.0')
 end
