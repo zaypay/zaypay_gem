@@ -102,11 +102,14 @@ module Zaypay
           puts 'Please either specify price_setting id and its API-key as first 2 arguments to #new, or create a config-file (checkout the plugin README)'
           raise e
         end
+
+        config_error = Zaypay::Error.new(:config_error, "You did not provide a price_setting id or/and an API-key. You can either pass it to the constructor or create a config file (check out README)")
+        raise config_error unless config
+
         @price_setting_id = config['default'] unless @price_setting_id
         @key = config[@price_setting_id]
         if @key.nil? || @price_setting_id.nil?
-          raise Zaypay::Error.new(:config_error, "You did not provide a price_setting id or/and an API-key. You can either pass it to the constructor
-                                                  or create a config file (check out README)")
+          raise config_error
         end
       end
     end

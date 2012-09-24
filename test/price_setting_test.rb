@@ -28,8 +28,17 @@ class PriceSettingTest < Test::Unit::TestCase
         end
         should "raise Error if yml is blank" do
           error = assert_raise Zaypay::Error do
-            YAML.expects(:load_file).with('anywhere/config/zaypay.yml').returns({})
+            YAML.expects(:load_file).with('anywhere/config/zaypay.yml').returns(false)
             Zaypay::PriceSetting.new
+          end
+          assert_equal :config_error, error.type
+          assert_match "You did not provide a price_setting id or/and an API-key", error.message 
+        end
+        
+        should "raise Error if yml only contains value for price_setting but not api-key" do
+          error = assert_raise Zaypay::Error do
+            YAML.expects(:load_file).with('anywhere/config/zaypay.yml').returns({@price_setting_id => nil})
+            ps = Zaypay::PriceSetting.new(@price_setting_id)
           end
           assert_equal :config_error, error.type
           assert_match "You did not provide a price_setting id or/and an API-key", error.message 
@@ -63,7 +72,7 @@ class PriceSettingTest < Test::Unit::TestCase
         context "without a valid yml file" do  
           should "raise RuntimeError" do
             error = assert_raise Zaypay::Error do
-              YAML.expects(:load_file).with('anywhere/config/zaypay.yml').returns({})
+              YAML.expects(:load_file).with('anywhere/config/zaypay.yml').returns(false)
               ps = Zaypay::PriceSetting.new(@price_setting_id)
             end
             assert_equal :config_error, error.type
