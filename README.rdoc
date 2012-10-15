@@ -2,21 +2,27 @@
 
 The Zaypay Gem allows your Ruby application to make HTTP-requests to the Zaypay API to retrieve information regarding your payments, price settings, etc.
 
+== VERSION 1.0.2
+
+Method _#ip_country_is_configured?_ has been renamed to _#country_has_been_configured_for_ip_
+
 == Installation
     sudo gem install zaypay
 
 == Example Projects
-Please check out https://github.com/zaypay for demo applications that are using the Zaypay gem as a dependency. They also demonstrate how to use the Zaypay gem to check status of a payment, handle reporting etc...
+Please check out https://github.com/zaypay for Ruby on Rails demo-applications that use the Zaypay gem as a dependency. They also demonstrate how to use the Zaypay gem to check status of a payment, handle reporting etc...
 
 == PriceSetting
-The Zaypay API works with Price Settings. Once you have signed up for an account with Zaypay, you can create a Price Setting, in which you define the price of your product/service, as well as the payment methods (e.g. phone or sms). For more info check 
+All communications to the Zaypay API go through Price Settings. Once you have signed up for an account with Zaypay, you can create a Price Setting, in which you define the price of your product (or service), price margins, as well as the payment methods (e.g. phone or sms). For more info check http://www.zaypay.com
+
 Every Price Setting has its own id and api-key, the latter is only known to you and should remain as such.
 
-Whenever you instantiate an object Zaypay::PriceSetting, you need to provide it a price_setting_id and api_key.
+Whenever you create an instance of Zaypay::PriceSetting, you need to provide it a price_setting_id and api_key.
+
     # Example
     Zaypay::PriceSetting.new(34567,"829e72d0f3b2e5bf764d667e98cf96a6")
 
-However if you are using Ruby On Rails, we would recommend you to list your price_setting ids and api_keys in a file named zaypay.yml in your config folder
+However if you are using Ruby On Rails, we would recommend you to list your price_setting ids and api_keys in config/zaypay.yml
 
     # config/zaypay.yml
     15347: b483bc8fga615234567890abcdef1234
@@ -25,48 +31,46 @@ However if you are using Ruby On Rails, we would recommend you to list your pric
 
 By doing so, you can call
 
-    >> price_setting = Zaypay::PriceSetting.new(22354)
+    price_setting = Zaypay::PriceSetting.new(22354)
     => #<Zaypay::PriceSetting:0x22a65b4 @key="d667e98cf96a6829e72d0f3b2e5bf764", @price_setting_id=22354>
-    # and it will find the corresponding API-key automatically
+    # it finds the corresponding API-key automatically
     
 By providing it an optional default value, you can instantiate it without an argument
 
-    >> Zaypay::PriceSetting.new
+    Zaypay::PriceSetting.new
     => #<Zaypay::PriceSetting:0x22a65b4 @key="b483bc8fga615234567890abcdef1234", @price_setting_id=15347>
-    # in this case, the code above will do the same thing as Zaypay::PriceSetting.new(15347)
+    # in this case, it will look for the default key, and assign the price_setting id and api_key accordingly
 
 == Available Methods
 
-=== #locale_for_ip(ip_address)
-This is useful if you want to know your customers location so you can provide him with a preselected country and language. It returns a hash with language and country as keys.
+=== #locale_for_ip(ip_address) {Zaypay::PriceSetting#locale_for_ip =>}
+This is useful if you want to know your customers location so you can provide him a preselected country and/or language. It returns a hash with language and country as keys.
 
-    >> price_setting.locale_for_ip('82.170.248.207')
+    price_setting.locale_for_ip('82.170.248.207')
     => {:language=>"nl", :country=>"NL"}
     
     # For example, you might want to set the default value for a language select_tag
-    >> price_setting.locale_for_ip('82.170.248.207')[:language]
+    price_setting.locale_for_ip('82.170.248.207')[:language]
     => 'nl'
 
-=== #locale_string_for_ip(ip_address)
-This method returns the locale as a String. Whenever you call #list_payment_methods or #create_payment, you will need to set the locale as a string first.
-    >> price_setting.locale_string_for_ip('82.170.248.207')
+=== #locale_string_for_ip(ip_address) {Zaypay::PriceSetting#locale_string_for_ip =>}
+This method returns the locale as a String. Whenever you call _#list_payment_methods_ or _#create_payment_, you will need to set the locale first.
+    price_setting.locale_string_for_ip('82.170.248.207')
     => "nl-NL"
 
-=== #ip_country_is_configured?(ip, options={})
-With this method, you can check whether the country of the incoming has been configured in your price_setting.
-If either returns nil or a hash with a :country key and a :locale key
-    >> price_setting.ip_country_is_configured?('82.170.248.207')
+=== #country_has_been_configured_for_ip(ip, options={}) {Zaypay::PriceSetting#country_has_been_configured_for_ip =>}
+With this method, you can check whether the country of the incoming request has been configured for your price_setting.
+It either returns nil or a hash with *:country* and *:locale* as keys
+    price_setting.ip_country_is_configured?('82.170.248.207')
     => {:country => {:name => 'Netherlands', :code => 'NL'}, :locale => {:country => 'NL', :language => 'nl'}}
 
-Since #list_payment_methods can only be called after a locale has been, this method might be useful in situation when want you present the payment_methods to the end-user based on his ip-address.
-
-As an option, you can pass it an optional amount, to see whether that country has been configured for the amount.
+As an option, you can pass it an optional amount, to see whether that country has been configured to accept payments for a specific amount.
     >> price_setting.ip_country_is_configured?('82.170.248.207', {:amount => 2})
 
-=== #list_locales(options={})
-This methods returns languages and countries that you have configured for your Price Setting as an array.
+=== #list_locales(options={}) {Zaypay::PriceSetting#list_locales =>}
+This methods returns a hash of with languages and countries that are available to your Price Setting as arrays.
 
-    >> price_setting.list_locales
+    price_setting.list_locales
     {:languages=>
       [{"native_name"=>"français", "code"=>"fr", "english_name"=>"French"},
        {"native_name"=>"Nederlands", "code"=>"nl", "english_name"=>"Dutch"},
@@ -80,31 +84,31 @@ This methods returns languages and countries that you have configured for your P
        {"name"=>"United States of America", "code"=>"US"}]}
 
     # Example with optional amount, returns available locales for that specific amount
-    >> price_setting.list_locales({:amount => 2})
+    price_setting.list_locales({:amount => 2})
 
-=== #list_countries(options={})
-Returns an array of countries that you have configured for your Price Setting
+=== #list_countries(options={}) {Zaypay::PriceSetting#list_countries =>}
+Returns an array of countries that are available to your Price Setting
 
-    >> price_setting.list_countries
+    price_setting.list_countries
     => [{"name"=>"Australia", "code"=>"AU"},
         {"name"=>"Austria", "code"=>"AT"} }
 
     # Example with optional amount, returns available countries for that specific amount
-    >> price_setting.list_countries({:amount => 2})
+    price_setting.list_countries({:amount => 2})
 
-=== #list_languages(options={})
-Returns an of available languages
+=== #list_languages(options={}) {Zaypay::PriceSetting#list_languages =>}
+Returns an array of available languages that are available to your Price Setting
 
-    >> price_setting.list_languages
+    price_setting.list_languages
     => [{"native_name"=>"français", "code"=>"fr", "english_name"=>"French"},
         {"native_name"=>"Nederlands", "code"=>"nl", "english_name"=>"Dutch"}]
 
-=== #list_payment_methods(options={})
-Once the end-user has selected his or her country (or determined by #locale_for_ip), you can display all payment methods for that locale.
-NOTE: Must set the locale first before calling this method, otherwise an error will be thrown
+=== #list_payment_methods(options={}) {Zaypay::PriceSetting#list_payment_methods =>}
+Once the locale has been set, you can display all payment methods available to your Price Setting for the given locale.
+NOTE: You must set the locale first before calling this method, otherwise an error will be raised.
 
-    >> price_setting.locale('nl-NL')
-    >> price_setting.list_payment_methods('nl-NL')
+    price_setting.locale('nl-NL')
+    price_setting.list_payment_methods('nl-NL')
     => {:payment_methods=>
         [{"charged_amount"=>#<BigDecimal:243e5e8,'0.8E0',4(8)>,
           "name"=>"phone",
@@ -124,20 +128,22 @@ NOTE: Must set the locale first before calling this method, otherwise an error w
           "formatted_amount"=>"€ 0,80",
           "payout"=>#<BigDecimal:243d38c,'0.26E0',4(8)>}]}
 
-    # Example with optional amount, returns available payment_methods for that specific amount
-    >> price_setting.list_payment_methods('nl-NL', {:amount => 5})
+    # Example with an optional amount, returns available payment_methods for that specific amount
+    price_setting.list_payment_methods('nl-NL', {:amount => 5})
 
     # Now that you know the payment_methods that are available, you can set the payment_method_id for your Price Setting
-    >> price_setting.price_setting_id = 2
+    price_setting.price_setting_id = 2
+    # Once the locale and the payment_method_id have been set, you can proceed to create a payment
 
-=== #create_payment(options={})
+=== #create_payment(options={}) {Zaypay::PriceSetting#create_payment =>}
 After the locale and the payment_method_id have been set, we can finally make a payment.
 NOTE: Locale and payment_method_id must be set before calling #create_payment, otherwise an error will be thrown
 
-You can also pass it your own custom parameters. In that case, when the status of the payment has been updated, we will send you a query to your report-url (as configured in your Price Setting on zaypay.com) including those custom parameters.
+You can also pass in your own custom variables, which you can use for your own reference whenever you check the details of the payment. 
+Also, in case you have activated the reporting feature in your price-setting (on the Zaypay platform), whenever the status of the payment has been updated, a query will be sent to your report-url (as configured in your Price Setting on zaypay.com) including those custom parameters.
 
-    >> price_setting.locale('nl-NL')
-    >> price_setting.price_setting_id = 2
+    price_setting.locale('nl-NL')
+    price_setting.price_setting_id = 2
     ps.create_payment(:product_id => '1234')
     => {:payment=>{:created_at=>2012-08-17 15:10:11 UTC, 
                    :id=>424729279, 
@@ -172,34 +178,48 @@ You can also pass it your own custom parameters. In that case, when the status o
     # You can also have :payalogue_id or :amount as options
     ps.create_payment(:product_id => '1234', :payalogue_id => '123456', :amount => 3)
 
-=== #show_payment(payment_id)
-A payment that is already in existence can be fetched with this method. It will return the same information as create_payment does. 
-However if the payment has no 'live' status no instructions are provided as there is no way for your customer to interact with this payment. 
-This happens when it becomes 'paid' for instance, or when it expires because your customer decided not to pay after all.
+=== #show_payment(payment_id) {Zaypay::PriceSetting#show_payment =>}
+A payment that is already in existence can be fetched with this method. It returns a hash representing the payment that you requested. 
+
+In most cases it also provides the payment instructions, unless when the payment has no 'live' status, as there is no way for your customer to interact with this payment anymore.
+This happens when it becomes 'paid' for instance, or when it has expired because your customer decided not to pay after all.
 
 A particular useful scenario for this method is when your report-url receives a query with a payment_id and status.
-You can verify whether the information received at your report-url is genuinely from Zaypay by calling the show_payment method and compared the payment status. 
-You might only want to update certain records within your application when the payment status on the Zaypay platform is really set to 'paid'.
+You can verify whether the information received at your report-url is genuinely from Zaypay by calling the show_payment method and compare the payment-statuses. 
+You might want to update certain records within your application when the payment status on the Zaypay platform is really set to 'paid'.
 
     # Example
     payment = price_setting.show_payment(123456)
     set_purchase_to_paid if payment[:status] == 'paid'
 
-=== #verification_code(payment_id, verification_code)
-In some countries (like the USA) we send your customer a verification code in the final (premium) message.
-If you are not using the Payalogue, you will have to create a form in which you present a field for your end_user to enter the verification_code.
-And this code will have to be sent to Zaypay along with its payment_id.
+=== #verification_code(payment_id, verification_code) {Zaypay::PriceSetting#verification_code =>}
+In some countries, due to local regulations, we send your customer a verification code in the final (premium) message. Payments that require verification code come with a *:verification_needed* key set to TRUE.
 
-If the code is correct, the payment goes :paid (your customer gets 3 attempts). 
-This method will apply the code to the payment and return the same info as create_payment or show_payment does.
+For such payments, you have to present the customer a form to submit the verification_code if you are not using the Payalogue. Once you receive the verification code from the customer, you can make a call to Zaypay through the _#verification_code_ method. This method returns a hash that represents a payment, and if the user has entered the verification code correctly, you will get a payment with status "paid". Your customer has 3 attempts to enter the verification code
 
-Please refer to the API integration demo application on github.com/zaypay to see this method in action.
+Please refer to the API integration demo application on {:link www.github.com/zaypay} to see this method in action.
+    
+    # Example
+    payment_id = 123456
+    payment = price_setting.verification_code(payment_id, 98765)
+    # returns a hash representing a payment
+    payment[:payment][:tries_left]
+    # returns the number of tries left to submit the verification code. The end-user has 3 attempts to do so.
+    payment[:payment][:verification_needed]
+    # returns a boolean value regarding whether the end_user needs to enter the verification code
 
-=== #mark_payload_provided
-You might find helpful to know that you can store weather the product has been provided for a payment in our database. 
-When the product is provided, you hit this method. That flips the boolean :payload_provided that you get in every payment-hash. 
-This way you'll never provide the product twice, without you needing to keep track of the payments "on your side". Again returns the same as create_payment or show_payment does.
+=== #mark_payload_provided(payment_id) {Zaypay::PriceSetting#mark_payload_provided =>}
+This method allows you to register the status of product delivery on the Zaypay platform.
 
+The idea is that once your customer has paid, you must deliver the product (be it a file or site access) that he/she has paid for. But in certain cases, you might want to grant him access only once.
+In these cases, you can use the _#mark_payload_provided_ method to track if a customer is misusing the system without having to keep track of all payments in your own database.
+
+    # Example
+    payment_id = 123456
+    payment = price_setting.mark_payload_provided(payment_id)
+    # returns a hash representing a payment
+    payment[:payment][:payload_provided] 
+    # returns a boolean value
 
 == For more information
 http://zaypay.com/api_integration_guide

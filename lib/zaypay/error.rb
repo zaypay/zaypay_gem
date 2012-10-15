@@ -1,6 +1,7 @@
 module Zaypay
+  # Errors that can be raised by the Zaypay gem
   class Error < StandardError
-     def initialize(type = nil, message = "default message")
+     def initialize(type = nil, message = "Error thrown by the Zaypay gem.")
        @type = type
        super(message)
      end

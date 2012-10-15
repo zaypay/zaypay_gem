@@ -24,7 +24,7 @@ class PriceSettingTest < Test::Unit::TestCase
           YAML.expects(:load_file).with('anywhere/config/zaypay.yml').returns({ @price_setting_id => @api_key, "default"=>@price_setting_id})
           ps = Zaypay::PriceSetting.new
           assert_equal @price_setting_id, ps.price_setting_id
-          assert_equal @api_key, ps.key
+          assert_equal @api_key, ps.api_key
         end
         should "raise Error if yml is blank" do
           error = assert_raise Zaypay::Error do
@@ -56,7 +56,7 @@ class PriceSettingTest < Test::Unit::TestCase
           YAML.expects(:load_file).never
           ps = Zaypay::PriceSetting.new(@price_setting_id, @api_key)
           assert_equal @price_setting_id, ps.price_setting_id
-          assert_equal @api_key, ps.key
+          assert_equal @api_key, ps.api_key
         end
       end
 
@@ -66,7 +66,7 @@ class PriceSettingTest < Test::Unit::TestCase
             YAML.expects(:load_file).with('anywhere/config/zaypay.yml').returns({@price_setting_id => @api_key})
             ps = Zaypay::PriceSetting.new(@price_setting_id)
             assert_equal @price_setting_id, ps.price_setting_id
-            assert_equal @api_key, ps.key
+            assert_equal @api_key, ps.api_key
           end
         end
         context "without a valid yml file" do  
@@ -82,6 +82,22 @@ class PriceSettingTest < Test::Unit::TestCase
       end
     end
 
+    context "#locale=()" do
+      context "string as arg" do
+        should 'return set locale as a string' do
+          @ps.locale = 'nl-NL'
+          assert_equal 'nl-NL', @ps.locale
+        end
+      end
+      
+      context "hash as arg" do
+        should 'return set locale as a string' do
+          @ps.locale = {:country=>"NL", :language=>"nl"} 
+          assert_equal 'nl-NL', @ps.locale
+        end
+      end
+    end
+    
     context "#locale_for_ip" do
       setup do
         FakeWeb.register_uri(:get,"#{@base_uri}/#{@ip}/pay/#{@ps.price_setting_id}/locale_for_ip?key=#{@api_key}", :body => 'test/locale_for_ip.xml', :content_type => "text/xml")
@@ -449,7 +465,7 @@ class PriceSettingTest < Test::Unit::TestCase
                                                   {:query => {:key => @api_key}, :headers => @headers }).returns @ip_response
           Zaypay::PriceSetting.expects(:get).with("#{@base_uri}//pay/#{@ps.price_setting_id}/list_locales", 
                                                   {:query => {:key => @api_key}, :headers => @headers }).returns @single_country_response
-          assert_nil @ps.ip_country_is_configured?(@ip)
+          assert_nil @ps.country_has_been_configured_for_ip(@ip)
         end
       end
 
@@ -464,7 +480,7 @@ class PriceSettingTest < Test::Unit::TestCase
                                                     {:query => {:key => @api_key}, :headers => @headers }).returns @ip_response
             Zaypay::PriceSetting.expects(:get).with("#{@base_uri}//pay/#{@ps.price_setting_id}/list_locales", 
                                                     {:query => {:key => @api_key}, :headers => @headers }).returns @multi_country_response
-            assert_equal({:country => {:name => 'Netherlands', :code => 'NL'}, :locale => {:country => 'NL', :language => 'nl'}} , @ps.ip_country_is_configured?(@ip))
+            assert_equal({:country => {:name => 'Netherlands', :code => 'NL'}, :locale => {:country => 'NL', :language => 'nl'}} , @ps.country_has_been_configured_for_ip(@ip))
           end
         end
       end
